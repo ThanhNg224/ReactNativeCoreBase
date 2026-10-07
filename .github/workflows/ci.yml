@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
 
 concurrency:
-  group: ci-${{ github.ref }}
+  group: ci-${{ github.event_name }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
@@ -22,6 +22,11 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run verify
+      - name: Diagnose formatting differences
+        if: failure()
+        run: |
+          npm run format
+          git diff -- src
 
   android-release:
     name: Android Release Build
