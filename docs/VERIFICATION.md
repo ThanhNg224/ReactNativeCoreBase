@@ -4,14 +4,14 @@ Verified locally on 2026-10-07. This records observed results, rather than a cla
 
 ## Source and template gates
 
-| Command / check                                                                                       | Result                                                                                  |
-| ----------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------- |
-| `npm run verify`                                                                                      | PASS: formatting, ESLint, strict TypeScript, 11 suites / 97 tests; Jest exits normally. |
-| `npx expo install --check`                                                                            | PASS: dependencies are compatible with SDK 57.                                          |
-| `npx expo-doctor`                                                                                     | PASS: 21/21 checks.                                                                     |
-| Clean and rename a temporary copy, including the display name `Thanh's App`; format and verify        | PASS: 9 suites / 91 tests after removing auth/home samples.                             |
-| Follow `ADDING_A_FEATURE.md` to add an `about` screen, translations and route; verify, then remove it | PASS: 11 suites / 97 tests; removal also passes typecheck.                              |
-| Focused app-flow tests with Jest `--detectOpenHandles`                                                | PASS: 2 suites / 6 tests; process exits.                                                |
+| Command / check                                                                                       | Result                                                                                                                                                             |
+| ----------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `npm run verify`                                                                                      | PASS: formatting, ESLint, strict TypeScript, 11 suites / 97 tests; Jest exits normally. Also passes in a temporary Git archive with an independent fresh `npm ci`. |
+| `npx expo install --check`                                                                            | PASS: dependencies are compatible with SDK 57.                                                                                                                     |
+| `npx expo-doctor`                                                                                     | PASS: 21/21 checks.                                                                                                                                                |
+| Clean and rename a temporary copy, including the display name `Thanh's App`; format and verify        | PASS: 9 suites / 91 tests after removing auth/home samples.                                                                                                        |
+| Follow `ADDING_A_FEATURE.md` to add an `about` screen, translations and route; verify, then remove it | PASS: 11 suites / 97 tests; removal also passes typecheck.                                                                                                         |
+| Focused app-flow tests with Jest `--detectOpenHandles`                                                | PASS: 2 suites / 6 tests; process exits.                                                                                                                           |
 
 Boundary regression tests cover aliases, relative imports and re-exports, cross-feature imports, storage access, source-root files, raw fetch and runtime globals. Initialization tests cover dry-run file preservation, cleaned-template typechecking and boundaries, quote/backslash escaping, repeat renaming, and invalid arguments.
 
@@ -26,7 +26,7 @@ Android: Samsung SM-N770F, Android 13 / API 33, arm64, physical device controlle
 - Debug: sign-out returns to Sign In; Android Back cannot return to the guarded tabs.
 - Release: `./gradlew :app:assembleRelease -PreactNativeArchitectures=arm64-v8a` passes with bundled JavaScript. The APK installs over the same package, opens without a development-client menu or Debug credential hint, signs in, and restores the session after force-stop/relaunch.
 
-iOS: iPhone 17 Pro simulator, iOS 26.5, Xcode 27.0. `pod install` installs 109 pods. Release builds succeed, including an arm64 build with `ARCHS=arm64 ONLY_ACTIVE_ARCH=YES CODE_SIGNING_ALLOWED=YES CODE_SIGN_IDENTITY=-`. This signed simulator build opens, signs in, and restores the session after terminate/relaunch. An unsigned simulator build lacks the Keychain entitlement and is suitable only for compilation checks; use the normal signed Expo command for runtime testing.
+iOS: iPhone 17 Pro simulator, iOS 26.5, Xcode 27.0. `pod install` installs 109 pods. Release builds succeed, including an arm64 build with `ARCHS=arm64 ONLY_ACTIVE_ARCH=YES CODE_SIGNING_ALLOWED=YES CODE_SIGN_IDENTITY=-`. This signed simulator build opens, signs in, and restores the session after terminate/relaunch. Dark theme and Vietnamese persist across relaunch; light/English are restored afterward. An unsigned simulator build lacks the Keychain entitlement and is suitable only for compilation checks; use the normal signed Expo command for runtime testing.
 
 Local Release reproduction:
 
@@ -40,7 +40,7 @@ No iOS physical-device, App Store signing, or production backend validation is c
 
 ## CI
 
-The workflow runs verification on pushes and pull requests, Android Release on pull requests and manual dispatch, and iOS simulator compilation on manual dispatch. iOS prebuild installs Pods before building the generated workspace. A remote run will be recorded after the initial push.
+The workflow runs verification on pushes and pull requests, Android Release on pull requests and manual dispatch, and iOS simulator compilation on manual dispatch. iOS prebuild installs Pods before building the generated workspace. The first remote run revealed that a fresh Uniwind installation did not yet expose custom theme tokens to Prettier. Format pre-hooks now generate theme artifacts through the bundled Uniwind CLI before sorting. Final remote run results will be recorded below.
 
 ## Dependency advisories
 

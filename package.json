@@ -67,7 +67,10 @@
     "test": "jest",
     "verify": "npm run format:check && npm run lint && npm run typecheck && npm test",
     "clean": "node scripts/clean.cjs",
-    "init-project": "node scripts/init-project.cjs"
+    "init-project": "node scripts/init-project.cjs",
+    "styles:generate": "uniwind generate-artifacts --css ./global.css --dts ./src/uniwind-types.d.ts",
+    "preformat": "npm run styles:generate",
+    "preformat:check": "npm run styles:generate"
   },
   "private": true,
   "engines": {

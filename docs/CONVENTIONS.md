@@ -49,3 +49,7 @@
 - Debug and Release share the identical identity, avoiding build flavor sprawl.
 - Debug runs with a 1-minute access token TTL to test refresh behavior. Release uses 30 minutes.
 - Release builds mandate HTTPS API URLs via `lib/env.ts` validation.
+
+## Formatting from a clean install
+
+Use `npm run format` and `npm run format:check`. Their pre-hooks generate Uniwind theme artifacts before Prettier sorts classes, so a fresh `npm ci` uses the same class order as a Metro build. After changing theme tokens, run `npm run styles:generate` before using editor-only formatting.

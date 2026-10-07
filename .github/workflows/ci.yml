@@ -22,11 +22,6 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run verify
-      - name: Diagnose formatting differences
-        if: failure()
-        run: |
-          npm run format
-          git diff -- src
 
   android-release:
     name: Android Release Build
