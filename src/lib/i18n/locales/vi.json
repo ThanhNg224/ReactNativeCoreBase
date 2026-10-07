@@ -1,0 +1,53 @@
+{
+  "common": {
+    "hello": "Xin chào",
+    "retry": "Thử lại",
+    "loading": "Đang tải…",
+    "empty": "Chưa có dữ liệu",
+    "home": "Trang chủ",
+    "settings": "Cài đặt",
+    "notFound": "Không tìm thấy trang",
+    "goHome": "Về trang chủ"
+  },
+  "errors": {
+    "unknown": "Đã xảy ra lỗi. Vui lòng thử lại.",
+    "network": "Kiểm tra kết nối và thử lại.",
+    "timeout": "Yêu cầu đã hết thời gian chờ. Hãy thử lại.",
+    "cancelled": "Yêu cầu đã được huỷ.",
+    "unauthorized": "Vui lòng đăng nhập lại.",
+    "forbidden": "Bạn không có quyền truy cập.",
+    "notFound": "Không tìm thấy nội dung này.",
+    "validation": "Kiểm tra thông tin và thử lại.",
+    "server": "Dịch vụ tạm thời không khả dụng. Hãy thử lại.",
+    "invalidResponse": "Dịch vụ trả về dữ liệu không hợp lệ."
+  },
+  "auth": {
+    "signIn": "Đăng nhập",
+    "username": "Tên đăng nhập",
+    "password": "Mật khẩu",
+    "required": "Vui lòng nhập trường này",
+    "invalidCredentials": "Tên đăng nhập hoặc mật khẩu không đúng",
+    "demoHint": "Dùng thử emilys / emilyspass",
+    "welcome": "Chào mừng trở lại",
+    "subtitle": "Đăng nhập để tiếp tục",
+    "signingIn": "Đang đăng nhập…"
+  },
+  "settings": {
+    "title": "Cài đặt",
+    "theme": "Giao diện",
+    "language": "Ngôn ngữ",
+    "system": "Hệ thống",
+    "light": "Sáng",
+    "dark": "Tối",
+    "en": "English",
+    "vi": "Tiếng Việt",
+    "about": "Thông tin",
+    "version": "Phiên bản",
+    "signOut": "Đăng xuất"
+  },
+  "home": {
+    "title": "Trang chủ",
+    "welcome": "Xin chào, {{name}}",
+    "profile": "Hồ sơ của bạn"
+  }
+}

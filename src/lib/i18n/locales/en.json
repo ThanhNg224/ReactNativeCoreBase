@@ -1,0 +1,53 @@
+{
+  "common": {
+    "hello": "Hello",
+    "retry": "Try again",
+    "loading": "Loading…",
+    "empty": "Nothing here yet",
+    "home": "Home",
+    "settings": "Settings",
+    "notFound": "Page not found",
+    "goHome": "Go home"
+  },
+  "errors": {
+    "unknown": "Something went wrong. Try again.",
+    "network": "Check your connection and try again.",
+    "timeout": "The request timed out. Try again.",
+    "cancelled": "The request was cancelled.",
+    "unauthorized": "Please sign in again.",
+    "forbidden": "You do not have access.",
+    "notFound": "This content could not be found.",
+    "validation": "Check your details and try again.",
+    "server": "The service is unavailable. Try again.",
+    "invalidResponse": "The service returned an unexpected response."
+  },
+  "auth": {
+    "signIn": "Sign in",
+    "username": "Username",
+    "password": "Password",
+    "required": "This field is required",
+    "invalidCredentials": "Incorrect username or password",
+    "demoHint": "Try emilys / emilyspass",
+    "welcome": "Welcome back",
+    "subtitle": "Sign in to continue",
+    "signingIn": "Signing in…"
+  },
+  "settings": {
+    "title": "Settings",
+    "theme": "Appearance",
+    "language": "Language",
+    "system": "System",
+    "light": "Light",
+    "dark": "Dark",
+    "en": "English",
+    "vi": "Tiếng Việt",
+    "about": "About",
+    "version": "Version",
+    "signOut": "Sign out"
+  },
+  "home": {
+    "title": "Home",
+    "welcome": "Hello, {{name}}",
+    "profile": "Your profile"
+  }
+}

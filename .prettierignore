@@ -1,0 +1,11 @@
+android/
+ios/
+.expo/
+node_modules/
+package-lock.json
+docs/plans/
+dist/
+coverage/
+.idea/
+# Generated and rewritten by Uniwind on bundle/config loads.
+src/uniwind-types.d.ts
