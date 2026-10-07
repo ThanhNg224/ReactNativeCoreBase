@@ -85,10 +85,11 @@ function updateReadme(content, { name, bundleId, scheme }) {
       `- **Android Package / iOS Bundle ID**: \`${bundleId}\``
     );
   }
-  if (name && bundleId) {
+  if (name || bundleId) {
     result = result.replace(
-      /The app(?:lication)? (?:has|follows) (?:a single |one )?identity:? \*\*[^*]+\*\* \(`[^`]+`\)/i,
-      () => `The app has one identity: **${name}** (\`${bundleId}\`)`
+      /The app(?:lication)? (?:has|follows) (?:a single |one )?identity:? \*\*([^*]+)\*\* \(`([^`]+)`\)/i,
+      (_match, previousName, previousBundleId) =>
+        `The app has one identity: **${name ?? previousName}** (\`${bundleId ?? previousBundleId}\`)`
     );
   }
   if (scheme)

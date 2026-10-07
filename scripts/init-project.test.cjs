@@ -165,6 +165,13 @@ test.each(["Thanh's App", 'The "Core" App', 'A \\ B', 'Dollar $& App'])(
       expect(fs.readFileSync(path.join(dir, 'app.config.ts'), 'utf8')).toContain(
         "const baseName = 'Renamed';"
       );
+      expect(fs.readFileSync(path.join(dir, 'README.md'), 'utf8')).toContain(
+        '**Renamed** (`com.name.app`)'
+      );
+      run(['--root', dir, '--bundle-id', 'com.renamed.app']);
+      expect(fs.readFileSync(path.join(dir, 'README.md'), 'utf8')).toContain(
+        '**Renamed** (`com.renamed.app`)'
+      );
     } finally {
       fs.rmSync(dir, { recursive: true, force: true });
     }

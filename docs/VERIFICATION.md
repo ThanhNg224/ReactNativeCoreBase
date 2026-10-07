@@ -4,14 +4,14 @@ Verified locally on 2026-10-07. This records observed results, rather than a cla
 
 ## Source and template gates
 
-| Command / check                                                                                       | Result                                                                                                                                                                                            |
-| ----------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `npm run verify`                                                                                      | PASS: formatting, ESLint, strict TypeScript, 11 suites / 98 tests; Jest exits normally. Before the final README escaping regression test, an independent fresh `npm ci` also passes all 97 tests. |
-| `npx expo install --check`                                                                            | PASS: dependencies are compatible with SDK 57.                                                                                                                                                    |
-| `npx expo-doctor`                                                                                     | PASS: 21/21 checks.                                                                                                                                                                               |
-| Clean and rename a temporary copy, including the display name `Thanh's App`; format and verify        | PASS: 9 suites / 91 tests after removing auth/home samples.                                                                                                                                       |
-| Follow `ADDING_A_FEATURE.md` to add an `about` screen, translations and route; verify, then remove it | PASS: 11 suites / 97 tests; removal also passes typecheck.                                                                                                                                        |
-| Focused app-flow tests with Jest `--detectOpenHandles`                                                | PASS: 2 suites / 6 tests; process exits.                                                                                                                                                          |
+| Command / check                                                                                       | Result                                                                                                                                                                                       |
+| ----------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `npm run verify`                                                                                      | PASS: formatting, ESLint, strict TypeScript, 11 suites / 98 tests; Jest exits normally. Independent fresh-install verification also passes; final initialization coverage includes 11 tests. |
+| `npx expo install --check`                                                                            | PASS: dependencies are compatible with SDK 57.                                                                                                                                               |
+| `npx expo-doctor`                                                                                     | PASS: 21/21 checks.                                                                                                                                                                          |
+| Clean and rename a temporary copy, including the display name `Thanh's App`; format and verify        | PASS: 9 suites / 91 tests after removing auth/home samples.                                                                                                                                  |
+| Follow `ADDING_A_FEATURE.md` to add an `about` screen, translations and route; verify, then remove it | PASS: 11 suites / 97 tests; removal also passes typecheck.                                                                                                                                   |
+| Focused app-flow tests with Jest `--detectOpenHandles`                                                | PASS: 2 suites / 6 tests; process exits.                                                                                                                                                     |
 
 Boundary regression tests cover aliases, relative imports and re-exports, cross-feature imports, storage access, source-root files, raw fetch and runtime globals. Initialization tests cover dry-run file preservation, cleaned-template typechecking and boundaries, quote/backslash escaping, literal `$&` preservation in README, repeat renaming, and invalid arguments.
 
@@ -40,7 +40,7 @@ No iOS physical-device, App Store signing, or production backend validation is c
 
 ## CI
 
-The workflow runs verification on pushes and pull requests, Android Release on pull requests and manual dispatch, and iOS simulator compilation on manual dispatch. iOS prebuild installs Pods before building the generated workspace. The first remote run revealed that a fresh Uniwind installation did not yet expose custom theme tokens to Prettier. Format pre-hooks now generate theme artifacts through the bundled Uniwind CLI before sorting. Final remote run results will be recorded below.
+The workflow runs verification on pushes and pull requests, Android Release on pull requests and manual dispatch, and iOS simulator compilation on manual dispatch. iOS prebuild installs Pods before building the generated workspace. The first remote run revealed that a fresh Uniwind installation did not yet expose custom theme tokens to Prettier. Format pre-hooks now generate theme artifacts through the bundled Uniwind CLI before sorting. [Full manual run on `3c268fc`](https://github.com/ThanhNg224/ReactNativeCoreBase/actions/runs/37605315072) passes all three jobs: Verify, Android Release Build, and iOS Simulator Debug. [Verification on `17ca2ad`](https://github.com/ThanhNg224/ReactNativeCoreBase/actions/runs/37605912182) also passes after adding the 98th regression test. Later changes affect initialization tooling and this report; app sources, dependency lockfile, Expo config and native build inputs remain unchanged. Each subsequent push also runs verification.
 
 ## Dependency advisories
 
@@ -51,3 +51,9 @@ The SDK 57 dependency tree currently reports 61 advisories (16 moderate, 45 high
 - [decode-uri-component advisory](https://github.com/advisories/GHSA-vcc3-ghjq-m6fr)
 - [UUID advisory](https://github.com/advisories/GHSA-w5hq-g745-h8pq)
 - [node-forge advisory](https://github.com/advisories/GHSA-86w9-cpqp-85rv)
+
+## Completion and cleanup
+
+P0–P4 acceptance checks are complete. The optional P5 work was not requested. Generated native projects, Expo/build caches, temporary fixture copies and device captures have been removed. The development Metro process was stopped and the simulator started for testing was shut down. Installed app data on the physical Android device was preserved. Completed local plans and their superseded reports were deleted; `docs/plans/` remains ignored.
+
+Both managed local Gradle workflows were finished successfully and removed only their wrapper-owned logs. Build question: **Does the completed single-app base build an arm64 Release APK with its bundled JavaScript?** Answer: **PASS**, including the final incremental build (62.478 seconds).
