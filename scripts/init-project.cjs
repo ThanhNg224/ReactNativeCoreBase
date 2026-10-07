@@ -76,8 +76,8 @@ function updatePackageJson(content, { slug }) {
 function updateReadme(content, { name, bundleId, scheme }) {
   let result = content;
   if (name) {
-    result = result.replace(/^#\s+.+$/m, `# ${name}`);
-    result = result.replace(/- \*\*Display Name\*\*: .+$/m, `- **Display Name**: ${name}`);
+    result = result.replace(/^#\s+.+$/m, () => `# ${name}`);
+    result = result.replace(/- \*\*Display Name\*\*: .+$/m, () => `- **Display Name**: ${name}`);
   }
   if (bundleId) {
     result = result.replace(
@@ -88,7 +88,7 @@ function updateReadme(content, { name, bundleId, scheme }) {
   if (name && bundleId) {
     result = result.replace(
       /The app(?:lication)? (?:has|follows) (?:a single |one )?identity:? \*\*[^*]+\*\* \(`[^`]+`\)/i,
-      `The app has one identity: **${name}** (\`${bundleId}\`)`
+      () => `The app has one identity: **${name}** (\`${bundleId}\`)`
     );
   }
   if (scheme)

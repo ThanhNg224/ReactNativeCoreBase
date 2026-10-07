@@ -138,30 +138,38 @@ describe('scripts/init-project.cjs', () => {
 });
 
 // Naming is an input boundary: valid display names must remain valid TypeScript.
-test.each(["Thanh's App", 'The "Core" App', 'A \\ B'])('escapes display name %s', (name) => {
-  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'corebase-name-'));
-  try {
-    fs.copyFileSync(path.join(__dirname, '../app.config.ts'), path.join(dir, 'app.config.ts'));
-    run(['--root', dir, '--name', name]);
-    const ts = require('typescript');
-    const source = fs.readFileSync(path.join(dir, 'app.config.ts'), 'utf8');
-    const result = ts.transpileModule(source, {
-      reportDiagnostics: true,
-      compilerOptions: { module: ts.ModuleKind.CommonJS },
-    });
-    expect(result.diagnostics).toEqual([]);
-    const evaluated = { exports: {} };
-    new Function('exports', result.outputText)(evaluated.exports);
-    expect(evaluated.exports.default.name).toBe(name);
-    // A second rename must match whichever quote style the first rename used.
-    run(['--root', dir, '--name', 'Renamed']);
-    expect(fs.readFileSync(path.join(dir, 'app.config.ts'), 'utf8')).toContain(
-      "const baseName = 'Renamed';"
-    );
-  } finally {
-    fs.rmSync(dir, { recursive: true, force: true });
+test.each(["Thanh's App", 'The "Core" App', 'A \\ B', 'Dollar $& App'])(
+  'escapes display name %s',
+  (name) => {
+    const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'corebase-name-'));
+    try {
+      fs.copyFileSync(path.join(__dirname, '../app.config.ts'), path.join(dir, 'app.config.ts'));
+      fs.copyFileSync(path.join(__dirname, '../README.md'), path.join(dir, 'README.md'));
+      run(['--root', dir, '--name', name, '--bundle-id', 'com.name.app']);
+      const readme = fs.readFileSync(path.join(dir, 'README.md'), 'utf8');
+      expect(readme).toContain(`# ${name}\n`);
+      expect(readme).toContain(`**Display Name**: ${name}`);
+      expect(readme).toContain(`**${name}** (\`com.name.app\`)`);
+      const ts = require('typescript');
+      const source = fs.readFileSync(path.join(dir, 'app.config.ts'), 'utf8');
+      const result = ts.transpileModule(source, {
+        reportDiagnostics: true,
+        compilerOptions: { module: ts.ModuleKind.CommonJS },
+      });
+      expect(result.diagnostics).toEqual([]);
+      const evaluated = { exports: {} };
+      new Function('exports', result.outputText)(evaluated.exports);
+      expect(evaluated.exports.default.name).toBe(name);
+      // A second rename must match whichever quote style the first rename used.
+      run(['--root', dir, '--name', 'Renamed']);
+      expect(fs.readFileSync(path.join(dir, 'app.config.ts'), 'utf8')).toContain(
+        "const baseName = 'Renamed';"
+      );
+    } finally {
+      fs.rmSync(dir, { recursive: true, force: true });
+    }
   }
-});
+);
 
 test.each([
   ['--name'],
