@@ -7,7 +7,11 @@
     "home": "Trang chủ",
     "settings": "Cài đặt",
     "notFound": "Không tìm thấy trang",
-    "goHome": "Về trang chủ"
+    "goHome": "Về trang chủ",
+    "errorTitle": "Đã xảy ra lỗi",
+    "offlineTitle": "Bạn đang ngoại tuyến",
+    "offlineMessage": "Không có kết nối. Đang hiển thị dữ liệu đã lưu.",
+    "cancel": "Huỷ"
   },
   "errors": {
     "unknown": "Đã xảy ra lỗi. Vui lòng thử lại.",
@@ -30,7 +34,10 @@
     "demoHint": "Dùng thử emilys / emilyspass",
     "welcome": "Chào mừng trở lại",
     "subtitle": "Đăng nhập để tiếp tục",
-    "signingIn": "Đang đăng nhập…"
+    "signingIn": "Đang đăng nhập…",
+    "showPassword": "Hiện mật khẩu",
+    "hidePassword": "Ẩn mật khẩu",
+    "offline": "Không có kết nối. Hãy kết nối mạng để đăng nhập."
   },
   "settings": {
     "title": "Cài đặt",
@@ -39,15 +46,21 @@
     "system": "Hệ thống",
     "light": "Sáng",
     "dark": "Tối",
-    "en": "English",
-    "vi": "Tiếng Việt",
     "about": "Thông tin",
     "version": "Phiên bản",
-    "signOut": "Đăng xuất"
+    "signOut": "Đăng xuất",
+    "preferences": "Tuỳ chọn",
+    "account": "Tài khoản",
+    "signOutConfirmTitle": "Đăng xuất?",
+    "signOutConfirmMessage": "Bạn sẽ cần đăng nhập lại để sử dụng ứng dụng.",
+    "themeUpdated": "Đã cập nhật giao diện",
+    "languageUpdated": "Đã cập nhật ngôn ngữ"
   },
   "home": {
     "title": "Trang chủ",
     "welcome": "Xin chào, {{name}}",
-    "profile": "Hồ sơ của bạn"
+    "profile": "Hồ sơ của bạn",
+    "username": "Tên đăng nhập",
+    "email": "Email"
   }
 }

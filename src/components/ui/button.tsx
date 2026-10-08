@@ -18,7 +18,7 @@ const buttonVariants = cva(
           Platform.select({ web: 'hover:bg-primary/90' })
         ),
         destructive: cn(
-          'bg-destructive shadow-sm shadow-black/5 active:bg-destructive/90 dark:bg-destructive/60',
+          'bg-destructive shadow-sm shadow-black/5 active:bg-destructive/90',
           Platform.select({
             web: 'hover:bg-destructive/90 focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40',
           })
@@ -40,10 +40,10 @@ const buttonVariants = cva(
         link: '',
       },
       size: {
-        default: cn('h-10 px-4 py-2 sm:h-9', Platform.select({ web: 'has-[>svg]:px-3' })),
-        sm: cn('h-9 gap-1.5 rounded-md px-3 sm:h-8', Platform.select({ web: 'has-[>svg]:px-2.5' })),
-        lg: cn('h-11 rounded-md px-6 sm:h-10', Platform.select({ web: 'has-[>svg]:px-4' })),
-        icon: 'h-10 w-10 sm:h-9 sm:w-9',
+        default: cn('h-12 px-5 py-2', Platform.select({ web: 'has-[>svg]:px-3' })),
+        sm: cn('h-10 gap-1.5 rounded-md px-4', Platform.select({ web: 'has-[>svg]:px-2.5' })),
+        lg: cn('h-14 rounded-md px-6', Platform.select({ web: 'has-[>svg]:px-4' })),
+        icon: 'size-12',
       },
     },
     defaultVariants: {
@@ -62,7 +62,7 @@ const buttonTextVariants = cva(
     variants: {
       variant: {
         default: 'text-primary-foreground',
-        destructive: 'text-white',
+        destructive: 'text-destructive-foreground',
         outline: cn(
           'group-active:text-accent-foreground',
           Platform.select({ web: 'group-hover:text-accent-foreground' })
@@ -98,6 +98,8 @@ function Button({ className, variant, size, ...props }: ButtonProps) {
       <Pressable
         className={cn(props.disabled && 'opacity-50', buttonVariants({ variant, size }), className)}
         role="button"
+        // The 40pt small button still needs a 48pt touch target.
+        hitSlop={size === 'sm' ? 4 : undefined}
         {...props}
       />
     </TextClassContext.Provider>

@@ -13,6 +13,10 @@ const storagePaths = ['react-native-mmkv', 'expo-secure-store'].map((name) => ({
   name,
   message: 'Storage packages may only be imported in src/lib/storage/**.',
 }));
+const toastPath = {
+  name: 'sonner-native',
+  message: 'Use toast from @/lib/toast; only the Toaster component mounts sonner-native.',
+};
 const relativePattern = {
   group: ['../../*'],
   message: 'Use aliases for imports beyond one parent.',
@@ -38,11 +42,11 @@ const features = fs
   .filter((d) => d.isDirectory())
   .map((d) => d.name);
 
-function importRule(forbidden = [], allowStorage = false) {
+function importRule(forbidden = [], { allowStorage = false, allowToast = false } = {}) {
   return [
     'error',
     {
-      paths: allowStorage ? [] : storagePaths,
+      paths: [...(allowStorage ? [] : storagePaths), ...(allowToast ? [] : [toastPath])],
       patterns: [
         relativePattern,
         ...forbidden.map((layer) => ({
@@ -175,7 +179,7 @@ module.exports = defineConfig([
       'no-restricted-imports': [
         'error',
         {
-          paths: storagePaths,
+          paths: [...storagePaths, toastPath],
           patterns: [
             relativePattern,
             { group: ['@/features/*/**'], message: 'Use the public feature entry point.' },
@@ -202,10 +206,25 @@ module.exports = defineConfig([
   {
     files: ['src/lib/storage/**/*.{ts,tsx}'],
     rules: {
-      'no-restricted-imports': importRule(
-        ['@/features', '@/components', '@/app', '@/providers'],
-        true
-      ),
+      'no-restricted-imports': importRule(['@/features', '@/components', '@/app', '@/providers'], {
+        allowStorage: true,
+      }),
+    },
+  },
+  {
+    files: ['src/lib/toast.ts'],
+    rules: {
+      'no-restricted-imports': importRule(['@/features', '@/components', '@/app', '@/providers'], {
+        allowToast: true,
+      }),
+    },
+  },
+  {
+    files: ['src/components/toaster.tsx'],
+    rules: {
+      'no-restricted-imports': importRule(['@/features', '@/app', '@/providers'], {
+        allowToast: true,
+      }),
     },
   },
   {

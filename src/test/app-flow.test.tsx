@@ -34,6 +34,10 @@ test('protected routes: sign-in → home → settings → sign-out clears query 
   await fireEvent.press(screen.getByText('Settings'));
   expect(await screen.findByText('Appearance')).toBeOnTheScreen();
   await fireEvent.press(screen.getByRole('button', { name: 'Sign out' }));
+  expect(await screen.findByText('Sign out?')).toBeOnTheScreen();
+  // The destructive dialog action confirms; the row itself only asks.
+  const [, confirm] = screen.getAllByRole('button', { name: 'Sign out' });
+  await fireEvent.press(confirm!);
   expect(await screen.findByText('Welcome back')).toBeOnTheScreen();
   await waitFor(() => expect(queryClient.getQueryCache().getAll()).toHaveLength(0));
   expect(useSessionStore.getState().status).toBe('signedOut');

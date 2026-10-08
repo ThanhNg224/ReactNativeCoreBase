@@ -12,7 +12,8 @@ const config: ExpoConfig = {
   },
   android: {
     adaptiveIcon: {
-      backgroundColor: '#E6F4FE',
+      // Matches the light `--color-background` token in global.css.
+      backgroundColor: '#f8fafc',
       foregroundImage: './assets/images/android-icon-foreground.png',
       backgroundImage: './assets/images/android-icon-background.png',
       monochromeImage: './assets/images/android-icon-monochrome.png',
@@ -24,14 +25,17 @@ const config: ExpoConfig = {
     [
       'expo-splash-screen',
       {
-        backgroundColor: '#208AEF',
+        // Splash colors match the `--color-background` tokens in global.css.
+        backgroundColor: '#f8fafc',
         image: './assets/images/splash-icon.png',
         imageWidth: 76,
+        dark: { backgroundColor: '#0f172a' },
       },
     ],
     'expo-dev-client',
     'expo-secure-store',
     'expo-localization',
+    'expo-image',
     './plugins/with-android-build-performance',
   ],
   experiments: {

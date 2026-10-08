@@ -101,11 +101,11 @@ function updateReadme(content, { name, bundleId, scheme }) {
 }
 
 const cleanedRootLayout = `import '@styles';
-export { ErrorBoundary } from 'expo-router';
+export { AppErrorBoundary as ErrorBoundary } from '@/components/app-error-boundary';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import * as SplashScreen from 'expo-splash-screen';
-import { useResolveClassNames, useUniwind } from 'uniwind';
+import { useUniwind } from 'uniwind';
 import { AppProviders } from '@/providers/app-providers';
 import { useStartup } from '@/providers/use-startup';
 
@@ -114,12 +114,11 @@ void SplashScreen.preventAutoHideAsync();
 export default function RootLayout() {
   const ready = useStartup();
   const { theme } = useUniwind();
-  const contentStyle = useResolveClassNames('bg-background');
   return (
     <AppProviders>
       <StatusBar style={theme === 'dark' ? 'light' : 'dark'} />
       {ready ? (
-        <Stack screenOptions={{ headerShown: false, contentStyle }}>
+        <Stack screenOptions={{ headerShown: false }}>
           <Stack.Screen name="(app)" />
         </Stack>
       ) : null}
@@ -129,18 +128,36 @@ export default function RootLayout() {
 `;
 
 const placeholderHomeTab = `import { useTranslation } from 'react-i18next';
-import { ScreenContainer } from '@/components/screen-container';
-import { Text } from '@/components/ui/text';
+import { Screen } from '@/components/screen';
 
 export default function HomeScreen() {
   const { t } = useTranslation();
-  return (
-    <ScreenContainer>
-      <Text>{t('common.home')}</Text>
-    </ScreenContainer>
-  );
+  return <Screen title={t('common.home')} />;
 }
 `;
+
+// Removes every block between `ui-catalog:start` and `ui-catalog:end` marker lines.
+// Markers are required while the catalog exists; an already-cleaned project has none.
+function stripCatalogBlocks(content, file, catalogExists) {
+  const lines = content.split('\n');
+  const kept = [];
+  let inside = false;
+  let found = false;
+  for (const line of lines) {
+    if (line.includes('ui-catalog:start')) {
+      inside = found = true;
+      continue;
+    }
+    if (line.includes('ui-catalog:end')) {
+      if (!inside) throw new Error(`Unmatched ui-catalog:end marker in ${file}`);
+      inside = false;
+      continue;
+    }
+    if (!inside) kept.push(line);
+  }
+  if (inside || (!found && catalogExists)) throw new Error(`Missing ui-catalog markers in ${file}`);
+  return kept.join('\n');
+}
 
 function cleanI18nJson(content) {
   const data = JSON.parse(content);
@@ -192,7 +209,9 @@ function run(argv = process.argv.slice(2)) {
     const toDelete = [
       path.join(args.root, 'src/features/auth'),
       path.join(args.root, 'src/features/home'),
+      path.join(args.root, 'src/features/ui-catalog'),
       path.join(args.root, 'src/app/(auth)'),
+      path.join(args.root, 'src/app/(app)/ui-catalog.tsx'),
       path.join(args.root, 'src/lib/auth/me-query.ts'),
       path.join(args.root, 'src/test/feature-screens.test.tsx'),
       path.join(args.root, 'src/test/app-flow.test.tsx'),
@@ -210,10 +229,21 @@ function run(argv = process.argv.slice(2)) {
     const homeTabIndexPath = path.join(args.root, 'src/app/(app)/(tabs)/index.tsx');
     actions.push({ type: 'write', file: homeTabIndexPath, content: placeholderHomeTab });
 
-    const locales = ['en.json', 'vi.json'];
-    for (const locale of locales) {
-      const locPath = path.join(args.root, 'src/lib/i18n/locales', locale);
-      if (fs.existsSync(locPath)) {
+    for (const relative of [
+      'src/app/(app)/_layout.tsx',
+      'src/features/settings/screens/settings-screen.tsx',
+    ]) {
+      const file = path.join(args.root, relative);
+      const catalogExists = fs.existsSync(path.join(args.root, 'src/features/ui-catalog'));
+      const content = stripCatalogBlocks(fs.readFileSync(file, 'utf8'), relative, catalogExists);
+      actions.push({ type: 'write', file, content });
+    }
+
+    const localesDir = path.join(args.root, 'src/lib/i18n/locales');
+    if (fs.existsSync(localesDir)) {
+      for (const locale of fs.readdirSync(localesDir, { withFileTypes: true })) {
+        if (!locale.isFile() || !locale.name.endsWith('.json')) continue;
+        const locPath = path.join(localesDir, locale.name);
         const original = fs.readFileSync(locPath, 'utf8');
         const updated = cleanI18nJson(original);
         actions.push({ type: 'write', file: locPath, content: updated });

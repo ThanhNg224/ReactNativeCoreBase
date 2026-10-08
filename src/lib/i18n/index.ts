@@ -4,19 +4,24 @@ import { initReactI18next } from 'react-i18next';
 
 import type { LanguagePreference } from '@/lib/preferences/preferences-store';
 
-import en from './locales/en.json';
-import vi from './locales/vi.json';
+import { LANGUAGES, type LanguageCode } from './languages';
 
-export function resolveLanguage(preference: LanguagePreference) {
+export type { LanguageCode };
+const codes = Object.keys(LANGUAGES) as LanguageCode[];
+
+export function resolveLanguage(preference: LanguagePreference): LanguageCode {
   if (preference !== 'system') return preference;
-  return getLocales()[0]?.languageCode === 'vi' ? 'vi' : 'en';
+  const device = getLocales()[0]?.languageCode;
+  return codes.find((code) => code === device) ?? 'en';
 }
 
 void i18n.use(initReactI18next).init({
-  resources: { en: { translation: en }, vi: { translation: vi } },
+  resources: Object.fromEntries(
+    codes.map((code) => [code, { translation: LANGUAGES[code].resources }])
+  ),
   lng: resolveLanguage('system'),
   fallbackLng: 'en',
-  supportedLngs: ['en', 'vi'],
+  supportedLngs: codes,
   interpolation: { escapeValue: false },
   initAsync: false,
 });

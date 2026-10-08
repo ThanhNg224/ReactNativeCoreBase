@@ -25,11 +25,33 @@ Add translation strings in both `src/lib/i18n/locales/en.json` and `src/lib/i18n
 
 ### 3. Build UI & Logic
 
-- Create screens in `src/features/<feature-name>/screens/<screen-name>-screen.tsx`.
-- Use existing components from `@/components/ui/` or `@/components/screen-container`.
+- Create screens in `src/features/<feature-name>/screens/<screen-name>-screen.tsx` and wrap them
+  in `Screen` (`title`, and a `footer` for the primary action).
+- Build from `@/components/ui/*`, `ListSection`/`ListItem`, `StateView`/`ErrorState` and
+  `Skeleton`; check the dev-only UI catalog (Settings → Developer) for what exists.
 - Use `useTranslation()` for copy.
-- Fetch remote data using `@tanstack/react-query` with `apiRequest`.
-- For form inputs, use `react-hook-form` and `zod`.
+- Fetch remote data with `@tanstack/react-query` and `apiRequest`; treat `fetchStatus === 'paused'`
+  as offline, not loading.
+- Forms use `FormField` with `react-hook-form` and `zod`.
+- A picker or short choice opens a sheet route (see ARCHITECTURE §6) rendering `OptionSheet`.
+
+```tsx
+export function ProfileScreen() {
+  const { t } = useTranslation();
+  const query = useQuery(profileQuery());
+  return (
+    <Screen title={t('profile.title')}>
+      {query.isPending && query.fetchStatus === 'fetching' ? <Skeleton className="h-24" /> : null}
+      {query.error ? <ErrorState error={query.error} onRetry={() => void query.refetch()} /> : null}
+      {query.data ? (
+        <ListSection>
+          <ListItem title={t('profile.bio')} value={query.data.bio} />
+        </ListSection>
+      ) : null}
+    </Screen>
+  );
+}
+```
 
 ### 4. Export Public API
 

@@ -1,10 +1,10 @@
 import '@styles';
-export { ErrorBoundary } from 'expo-router';
-import { useSessionStore } from '@/lib/auth/session';
+export { AppErrorBoundary as ErrorBoundary } from '@/components/app-error-boundary';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import * as SplashScreen from 'expo-splash-screen';
-import { useResolveClassNames, useUniwind } from 'uniwind';
+import { useUniwind } from 'uniwind';
+import { useSessionStore } from '@/lib/auth/session';
 import { AppProviders } from '@/providers/app-providers';
 import { useStartup } from '@/providers/use-startup';
 
@@ -14,12 +14,11 @@ export default function RootLayout() {
   const ready = useStartup();
   const status = useSessionStore((state) => state.status);
   const { theme } = useUniwind();
-  const contentStyle = useResolveClassNames('bg-background');
   return (
     <AppProviders>
       <StatusBar style={theme === 'dark' ? 'light' : 'dark'} />
       {ready ? (
-        <Stack screenOptions={{ headerShown: false, contentStyle }}>
+        <Stack screenOptions={{ headerShown: false }}>
           <Stack.Protected guard={status === 'signedIn'}>
             <Stack.Screen name="(app)" />
           </Stack.Protected>

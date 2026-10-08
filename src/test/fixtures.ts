@@ -1,4 +1,4 @@
-import type { SessionUser } from '@/lib/auth/session';
+import type { SessionUser } from '@/lib/auth/auth-contract';
 
 export const user: SessionUser = {
   id: 1,

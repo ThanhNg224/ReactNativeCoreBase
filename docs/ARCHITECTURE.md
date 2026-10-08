@@ -5,31 +5,36 @@
 ```
 src/
 ├── app/                       # Routing only (Expo Router thin screens)
-│   ├── _layout.tsx            # Providers + protected routes
+│   ├── _layout.tsx            # Providers, protected routes, error boundary
 │   ├── (auth)/                # Auth group routes (sign-in)
-│   └── (app)/                 # Authenticated screens and tabs
+│   └── (app)/                 # Authenticated stack: tabs, sheet routes, dev-only UI catalog
 ├── features/                  # Isolated business capabilities
-│   ├── auth/                  # Login screens, form, mutation
-│   ├── home/                  # Home screen dashboard
-│   └── settings/              # Appearance, language, session actions
-├── components/                # Shared UI and reusable components
-│   ├── ui/                    # Shadcn-style primitives (Buttons, Inputs, Cards...)
-│   ├── screen-container.tsx   # SafeArea + 8pt grid container
-│   ├── error-view.tsx         # Unified error view with retry
-│   ├── loading-view.tsx       # Loading indicator
-│   └── empty-view.tsx         # Empty state placeholder
-├── lib/                       # Foundation and infrastructural services
-│   ├── env.ts                 # Validated environment configuration
+│   ├── auth/                  # Sign-in screen, form, mutation
+│   ├── home/                  # Profile dashboard
+│   ├── settings/              # Preference rows, appearance/language sheets, sign-out
+│   └── ui-catalog/            # Debug-only component gallery (removed by --clean-samples)
+├── components/                # Shared UI
+│   ├── ui/                    # React Native Reusables primitives + list.tsx
+│   ├── screen.tsx             # Screen frame: safe areas, title, keyboard, sticky footer
+│   ├── state-view.tsx         # Empty / error / offline / loading states
+│   ├── form-field.tsx         # react-hook-form field: label, control, error
+│   ├── option-sheet.tsx       # Content for a fitToContents picker sheet
+│   ├── toaster.tsx            # Themed sonner-native host (mounted once)
+│   └── app-error-boundary.tsx # Root render-error fallback
+├── lib/                       # Foundation services
+│   ├── env.ts                 # Validated config (apiBaseUrl, HTTPS in Release)
 │   ├── api/                   # HTTP client, single-flight refresh, ApiError
-│   ├── auth/                  # Session store, token lifecycle, me query
-│   ├── storage/               # MMKV (kv) & SecureStore (secure queue)
+│   ├── auth/                  # auth-contract.ts (backend shapes), session, me query
+│   ├── storage/               # MMKV (kv) and SecureStore (secure queue)
 │   ├── preferences/           # Theme and language store (persisted)
-│   ├── i18n/                  # Typed i18n instance and locale dictionaries
-│   ├── query-client.ts        # TanStack Query singleton configuration
-│   ├── logger.ts              # Scoped logger (debug suppressed in release)
-│   └── utils.ts               # Shared helpers (cn)
-├── providers/                 # React context providers and app startup
-└── test/                      # Test helpers, MSW server, mock fixtures
+│   ├── i18n/                  # languages.ts registry, typed i18n, locale JSON
+│   ├── query-client.ts        # TanStack Query client, focus + NetInfo online wiring
+│   ├── use-is-online.ts       # Connectivity hook for UI
+│   ├── toast.ts               # The only toast entry point for features
+│   ├── logger.ts              # Scoped logger; logger.error is the crash-reporting hook
+│   └── utils.ts               # cn()
+├── providers/                 # App providers, startup, navigation theme
+└── test/                      # Test helpers, MSW server, cross-feature tests
 ```
 
 ## 2. Dependency & Import Boundaries
@@ -38,7 +43,7 @@ Boundaries are strictly enforced via ESLint flat configuration (`eslint.config.c
 
 | Layer           | Can Import From                                                         | Forbidden To Import                                                                                                                 |
 | --------------- | ----------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
-| `app/`          | `features/*` (only via `index.ts`), `components/`, `lib/`, `providers/` | Deep feature internals (`@/features/*/**`), `react-native-mmkv`, `expo-secure-store`, raw `fetch`                                   |
+| `app/`          | `features/*` (only via `index.ts`), `components/`, `lib/`, `providers/` | Deep feature internals (`@/features/*/**`), `react-native-mmkv`, `expo-secure-store`, `sonner-native`, raw `fetch`                  |
 | `features/<f>/` | `components/`, `lib/`                                                   | Other features (`@/features/<other>/**`), `app/**`, `providers/**`, storage packages, raw `fetch`, inline style objects, hex colors |
 | `components/`   | `lib/`                                                                  | `features/**`, `app/**`, `providers/**`, storage packages, raw `fetch`                                                              |
 | `lib/storage/`  | Pure storage packages (`MMKV`, `SecureStore`)                           | `features/**`, `components/**`, `app/**`, `providers/**`                                                                            |
@@ -79,3 +84,40 @@ Replay 1x                           (retryable)               throw Cancelled
 ### Epoch Fencing
 
 An in-memory `sessionEpoch` increments on every sign-in and sign-out. All asynchronous operations (hydration, token refresh, background profile updates) record the starting epoch. If the epoch has changed when the operation completes, results are discarded immediately to eliminate race conditions.
+
+## 4. Backend Contract
+
+`src/lib/auth/auth-contract.ts` holds everything specific to the backend: the app's internal
+`SessionUser`/`SessionTokens` models, login/refresh/me request builders, response schemas that
+transform the backend shape into those models, refresh reject statuses and the token TTL.
+
+Switching to a backend with the same model (access + refresh token, `Authorization: Bearer`)
+means editing this file and `apiBaseUrl` in `app.config.ts`. The Bearer header, POST refresh and
+single-flight logic stay in `lib/api`. A different sign-in UI (email, OTP) still changes
+`features/auth`. Other auth models (cookies, OAuth/PKCE) are a project decision.
+
+## 5. Providers
+
+`AppProviders` nests, outermost first: `GestureHandlerRootView` → `KeyboardProvider` →
+`QueryClientProvider` → `I18nextProvider` → `ThemeProvider` (React Navigation theme built from
+the CSS tokens) → screens, then `PortalHost` and `Toaster`. Theme changes are applied
+synchronously from the preferences store so UI rendered in the same update uses the new tokens.
+
+## 6. Screens, Sheets and Network State
+
+- **`Screen`** owns safe areas. Top/left/right always; bottom only outside tabs (the tab layout
+  passes `TabScreenLayout` as `screenLayout`, and the tab bar reserves the inset). A `footer`
+  holds primary actions: it sits below the scroll view, clears the bottom inset itself, and
+  floats on the keyboard via `KeyboardStickyView`; the scroll view's `bottomOffset` keeps the
+  focused input above the footer.
+- **Sheets** are routes in the `(app)` stack with `presentation: 'formSheet'` and
+  `sheetAllowedDetents: 'fitToContents'`. Sheet screens render natural-height content
+  (`OptionSheet`), never `Screen` or a `flex-1` container. Long scrolling sheets need fixed
+  detents (see the React Navigation native-stack form sheet notes).
+- **Network modes**: queries use `networkMode: 'online'` and pause offline (`fetchStatus:
+'paused'` is not loading; screens keep cached data and show an offline notice). Mutations use
+  `'always'` and fail fast with `ApiError('network')`. Offline mutation queues are a project
+  decision.
+- **Debug-only routes** sit inside `<Stack.Protected guard={__DEV__}>`, which removes them from
+  navigation in Release. `ui-catalog:start`/`ui-catalog:end` markers let `init-project` strip the
+  catalog.

@@ -10,7 +10,7 @@ export function resolveEnv(extra: unknown, { isDev }: { isDev: boolean }) {
   if (!isDev && !result.apiBaseUrl.startsWith('https://')) {
     throw new Error('Release builds require an HTTPS API base URL');
   }
-  return { ...result, accessTokenTtlMins: isDev ? 1 : 30 };
+  return result;
 }
 
 export const env = resolveEnv(Constants.expoConfig?.extra, { isDev: __DEV__ });

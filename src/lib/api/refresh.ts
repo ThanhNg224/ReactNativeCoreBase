@@ -1,4 +1,5 @@
-import { session, sessionTokensSchema } from '@/lib/auth/session';
+import { authContract } from '@/lib/auth/auth-contract';
+import { session } from '@/lib/auth/session';
 import { env } from '@/lib/env';
 import { ApiError, apiErrorFromStatus, isApiError } from './api-error';
 import { joinUrl } from './join-url';
@@ -23,16 +24,17 @@ async function runRefresh(start: number): Promise<RefreshOutcome> {
   const lifetime = createRequestLifetime(15_000);
   try {
     return await lifetime.race(async () => {
-      const response = await fetch(joinUrl(env.apiBaseUrl, '/auth/refresh'), {
+      const request = authContract.refresh.request(token);
+      const response = await fetch(joinUrl(env.apiBaseUrl, request.path), {
         method: 'POST',
         credentials: 'omit',
         signal: lifetime.signal,
         headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
-        body: JSON.stringify({ refreshToken: token, expiresInMins: env.accessTokenTtlMins }),
+        body: JSON.stringify(request.body),
       });
       if (start !== session.epoch()) return { type: 'stale' };
       if (lifetime.reason) throw new ApiError(lifetime.reason);
-      if ([400, 401, 403].includes(response.status)) {
+      if (authContract.refresh.rejectStatuses.includes(response.status)) {
         const cleanup = session.signOut('expired');
         const signedOutEpoch = session.epoch();
         await cleanup;
@@ -46,7 +48,7 @@ async function runRefresh(start: number): Promise<RefreshOutcome> {
       } catch {
         throw new ApiError('invalidResponse');
       }
-      const parsed = sessionTokensSchema.safeParse(json);
+      const parsed = authContract.refresh.response.safeParse(json);
       if (!parsed.success) throw new ApiError('invalidResponse');
       if (lifetime.reason) throw new ApiError(lifetime.reason);
       const applied = await session.applyRefreshedTokens(parsed.data, start);

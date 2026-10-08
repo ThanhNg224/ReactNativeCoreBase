@@ -1,23 +1,9 @@
-import { z } from 'zod';
 import { create } from 'zustand';
 import { secureDelete, secureGet, secureSet } from '@/lib/storage/secure';
 import { queryClient } from '@/lib/query-client';
 import { logger } from '@/lib/logger';
+import { sessionUserSchema, type SessionTokens, type SessionUser } from './auth-contract';
 
-export const sessionUserSchema = z.object({
-  id: z.number(),
-  username: z.string(),
-  firstName: z.string(),
-  lastName: z.string(),
-  email: z.string(),
-  image: z.string(),
-});
-export const sessionTokensSchema = z.object({
-  accessToken: z.string().min(1),
-  refreshToken: z.string().min(1),
-});
-export type SessionUser = z.infer<typeof sessionUserSchema>;
-export type SessionTokens = z.infer<typeof sessionTokensSchema>;
 export type SessionStatus = 'loading' | 'signedOut' | 'signedIn';
 export const useSessionStore = create<{ status: SessionStatus; user: SessionUser | null }>(() => ({
   status: 'loading',

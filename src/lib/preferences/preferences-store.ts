@@ -1,10 +1,11 @@
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 
+import type { LanguageCode } from '@/lib/i18n/languages';
 import { zustandStorage } from '@/lib/storage/kv';
 
 export type ThemePreference = 'system' | 'light' | 'dark';
-export type LanguagePreference = 'system' | 'en' | 'vi';
+export type LanguagePreference = 'system' | LanguageCode;
 interface Preferences {
   theme: ThemePreference;
   language: LanguagePreference;

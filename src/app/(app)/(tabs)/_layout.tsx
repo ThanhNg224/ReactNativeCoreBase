@@ -1,10 +1,13 @@
 import { Tabs } from 'expo-router';
 import { House, Settings } from 'lucide-react-native';
 import { useTranslation } from 'react-i18next';
+import { TabScreenLayout } from '@/components/screen';
 export default function TabLayout() {
   const { t } = useTranslation();
   return (
-    <Tabs screenOptions={{ headerShown: false }}>
+    <Tabs
+      screenOptions={{ headerShown: false }}
+      screenLayout={({ children }) => <TabScreenLayout>{children}</TabScreenLayout>}>
       <Tabs.Screen
         name="index"
         options={{

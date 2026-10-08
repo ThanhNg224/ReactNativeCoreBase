@@ -6,6 +6,7 @@
 - `docs/CONVENTIONS.md`: kebab-case naming, ApiError, i18n, styling tokens, query state.
 - `docs/ADDING_A_FEATURE.md`: step-by-step checklist for new features.
 - `docs/VERIFICATION.md`: verification commands, evidence, and limitations.
+- `docs/UPGRADING.md`: SDK upgrade procedure and the list of locally modified RNR components.
 
 ## Invariants
 
@@ -15,6 +16,12 @@
 - Work on the current branch. Do not create branches or worktrees unless requested.
 - Tokens reside strictly in module memory and Keychain/Keystore via `lib/storage/secure.ts`, never in MMKV or logs.
 - Cross-feature imports are forbidden by ESLint; shared abstractions belong in `lib/` or `components/`.
+- UI stack: Uniwind + React Native Reusables (`components/ui`), Reanimated 4 + Worklets, Gesture
+  Handler, Keyboard Controller, sonner-native (only via `lib/toast`), NetInfo. Screens use
+  `Screen`; touch targets are at least 48 pt; colors come from `global.css` tokens.
+- Backend-specific shapes live only in `src/lib/auth/auth-contract.ts`.
+- Environments, flavors, EAS/OTA, signing and crash-reporting vendors are project decisions;
+  do not add them to the base.
 - Do not use global `URL`, `URLSearchParams`, `TextEncoder`, `TextDecoder`, `crypto`,
   or `AbortSignal.timeout` / `AbortSignal.any` in app code.
 - Install native packages with `npx expo install`; declare required peers explicitly

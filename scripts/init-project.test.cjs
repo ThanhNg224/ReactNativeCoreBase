@@ -69,6 +69,23 @@ describe('scripts/init-project.cjs', () => {
   });
 
   test('applies project rename and clean-samples, passing typecheck', () => {
+    // New languages must remain registered with the same keys after sample cleanup.
+    const localesDir = path.join(tempDir, 'src/lib/i18n/locales');
+    fs.copyFileSync(path.join(localesDir, 'en.json'), path.join(localesDir, 'fr.json'));
+    const languagesPath = path.join(tempDir, 'src/lib/i18n/languages.ts');
+    fs.writeFileSync(
+      languagesPath,
+      fs
+        .readFileSync(languagesPath, 'utf8')
+        .replace(
+          "import en from './locales/en.json';",
+          "import en from './locales/en.json';\nimport fr from './locales/fr.json';"
+        )
+        .replace(
+          "en: { label: 'English', resources: en },",
+          "en: { label: 'English', resources: en },\n  fr: { label: 'Français', resources: fr },"
+        )
+    );
     run([
       '--root',
       tempDir,
@@ -108,29 +125,53 @@ describe('scripts/init-project.cjs', () => {
     expect(fs.existsSync(path.join(tempDir, 'src/features/home'))).toBe(false);
     expect(fs.existsSync(path.join(tempDir, 'src/app/(auth)'))).toBe(false);
     expect(fs.existsSync(path.join(tempDir, 'src/lib/auth/me-query.ts'))).toBe(false);
+    expect(fs.existsSync(path.join(tempDir, 'src/features/ui-catalog'))).toBe(false);
+    expect(fs.existsSync(path.join(tempDir, 'src/app/(app)/ui-catalog.tsx'))).toBe(false);
+    for (const file of [
+      'src/app/(app)/_layout.tsx',
+      'src/features/settings/screens/settings-screen.tsx',
+    ]) {
+      expect(fs.readFileSync(path.join(tempDir, file), 'utf8')).not.toMatch(/ui-catalog/);
+    }
 
     // Check preserved foundations
     expect(fs.existsSync(path.join(tempDir, 'src/lib/api/client.ts'))).toBe(true);
     expect(fs.existsSync(path.join(tempDir, 'src/lib/auth/session.ts'))).toBe(true);
     expect(fs.existsSync(path.join(tempDir, 'src/features/settings'))).toBe(true);
+    expect(fs.existsSync(path.join(tempDir, 'src/lib/auth/auth-contract.ts'))).toBe(true);
+    expect(fs.existsSync(path.join(tempDir, 'src/lib/i18n/languages.ts'))).toBe(true);
 
     // Check cleaned i18n
-    const enJson = JSON.parse(
-      fs.readFileSync(path.join(tempDir, 'src/lib/i18n/locales/en.json'), 'utf8')
-    );
-    expect(enJson.auth).toBeUndefined();
-    expect(enJson.home).toBeUndefined();
-    expect(enJson.common).toBeDefined();
+    for (const locale of ['en', 'vi', 'fr']) {
+      const resources = JSON.parse(
+        fs.readFileSync(path.join(localesDir, `${locale}.json`), 'utf8')
+      );
+      expect(resources.auth).toBeUndefined();
+      expect(resources.home).toBeUndefined();
+      expect(resources.common).toBeDefined();
+    }
 
-    // Verify typecheck on the cleaned codebase
+    // Verify typecheck and lint (unused imports, boundaries) on the cleaned codebase
     expect(() => {
       execFileSync('npx', ['tsc', '--noEmit'], { cwd: tempDir, stdio: 'pipe' });
+    }).not.toThrow();
+    expect(() => {
+      execFileSync('npx', ['eslint', 'src', '--max-warnings', '0'], {
+        cwd: tempDir,
+        stdio: 'pipe',
+      });
     }).not.toThrow();
     // The generated project must retain working boundary checks after deleting samples.
     expect(() =>
       execFileSync(
         'npx',
-        ['jest', '--runInBand', '--runTestsByPath', 'scripts/eslint-boundaries.test.cjs'],
+        [
+          'jest',
+          '--runInBand',
+          '--runTestsByPath',
+          'scripts/eslint-boundaries.test.cjs',
+          'src/lib/i18n/index.test.ts',
+        ],
         { cwd: tempDir, stdio: 'pipe', timeout: 30000 }
       )
     ).not.toThrow();
@@ -177,6 +218,25 @@ test.each(["Thanh's App", 'The "Core" App', 'A \\ B', 'Dollar $& App'])(
     }
   }
 );
+
+test('clean-samples requires catalog markers only while the catalog exists', () => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'corebase-markers-'));
+  try {
+    for (const file of [
+      'src/app/(app)/_layout.tsx',
+      'src/features/settings/screens/settings-screen.tsx',
+    ]) {
+      fs.mkdirSync(path.join(dir, path.dirname(file)), { recursive: true });
+      fs.writeFileSync(path.join(dir, file), 'export {};\n');
+    }
+    // Already cleaned (no catalog): nothing to strip.
+    expect(() => run(['--root', dir, '--clean-samples', '--dry-run'])).not.toThrow();
+    fs.mkdirSync(path.join(dir, 'src/features/ui-catalog'), { recursive: true });
+    expect(() => run(['--root', dir, '--clean-samples'])).toThrow('Missing ui-catalog markers');
+  } finally {
+    fs.rmSync(dir, { recursive: true, force: true });
+  }
+});
 
 test.each([
   ['--name'],

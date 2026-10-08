@@ -14,7 +14,7 @@ module.exports = {
   transformIgnorePatterns: expoPreset.transformIgnorePatterns.map((pattern) =>
     pattern.replace(
       'standard-navigation',
-      'standard-navigation|@rn-primitives|msw|@msw|@open-draft|until-async|rettime|cookie'
+      'standard-navigation|@rn-primitives|sonner-native|msw|@msw|@open-draft|until-async|rettime|cookie'
     )
   ),
   testTimeout: 30000,

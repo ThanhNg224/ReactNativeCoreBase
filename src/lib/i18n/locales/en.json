@@ -7,7 +7,11 @@
     "home": "Home",
     "settings": "Settings",
     "notFound": "Page not found",
-    "goHome": "Go home"
+    "goHome": "Go home",
+    "errorTitle": "Something went wrong",
+    "offlineTitle": "You're offline",
+    "offlineMessage": "No connection. Showing your saved data.",
+    "cancel": "Cancel"
   },
   "errors": {
     "unknown": "Something went wrong. Try again.",
@@ -30,7 +34,10 @@
     "demoHint": "Try emilys / emilyspass",
     "welcome": "Welcome back",
     "subtitle": "Sign in to continue",
-    "signingIn": "Signing in…"
+    "signingIn": "Signing in…",
+    "showPassword": "Show password",
+    "hidePassword": "Hide password",
+    "offline": "No connection. Connect to the internet to sign in."
   },
   "settings": {
     "title": "Settings",
@@ -39,15 +46,21 @@
     "system": "System",
     "light": "Light",
     "dark": "Dark",
-    "en": "English",
-    "vi": "Tiếng Việt",
     "about": "About",
     "version": "Version",
-    "signOut": "Sign out"
+    "signOut": "Sign out",
+    "preferences": "Preferences",
+    "account": "Account",
+    "signOutConfirmTitle": "Sign out?",
+    "signOutConfirmMessage": "You will need to sign in again to use the app.",
+    "themeUpdated": "Appearance updated",
+    "languageUpdated": "Language updated"
   },
   "home": {
     "title": "Home",
     "welcome": "Hello, {{name}}",
-    "profile": "Your profile"
+    "profile": "Your profile",
+    "username": "Username",
+    "email": "Email"
   }
 }

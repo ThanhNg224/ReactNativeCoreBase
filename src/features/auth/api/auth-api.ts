@@ -1,19 +1,11 @@
 import { apiRequest } from '@/lib/api/client';
-import { env } from '@/lib/env';
-import { sessionUserSchema, sessionTokensSchema } from '@/lib/auth/session';
+import { authContract, type SignInInput } from '@/lib/auth/auth-contract';
 
-export type SignInInput = { username: string; password: string };
-const loginResponseSchema = sessionUserSchema
-  .extend(sessionTokensSchema.shape)
-  .transform((response) => ({
-    tokens: sessionTokensSchema.parse(response),
-    user: sessionUserSchema.parse(response),
-  }));
+export type { SignInInput };
 export const signIn = (input: SignInInput) =>
   apiRequest({
     method: 'POST',
-    path: '/auth/login',
+    ...authContract.login.request(input),
     auth: false,
-    body: { ...input, expiresInMins: env.accessTokenTtlMins },
-    schema: loginResponseSchema,
+    schema: authContract.login.response,
   });

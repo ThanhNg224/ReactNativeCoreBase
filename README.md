@@ -57,6 +57,7 @@ DummyJSON public auth backend is used for demonstration:
 - [Engineering Conventions](docs/CONVENTIONS.md)
 - [Adding a New Feature](docs/ADDING_A_FEATURE.md)
 - [Verification Evidence](docs/VERIFICATION.md)
+- [Upgrading](docs/UPGRADING.md)
 - [Agent Guidelines & Invariants](AGENTS.md)
 
 ## Start Your Own Project
@@ -69,7 +70,17 @@ npm run format
 npm run verify
 ```
 
-Use `--dry-run` to preview changes. `--clean-samples` removes auth/home demos while keeping API, session, preferences, and Settings. Regenerate native projects after changing app identity with `npx expo prebuild --clean`.
+Use `--dry-run` to preview changes. `--clean-samples` removes the auth/home demos and the dev-only UI catalog while keeping the API client, session, auth contract, preferences, Settings and every shared component. Regenerate native projects after changing app identity with `npx expo prebuild --clean`.
+
+Then make it yours:
+
+1. Replace the icon and splash assets in `assets/` and the colors in `app.config.ts`.
+2. Adjust the theme tokens in `global.css` (keep text pairs at WCAG AA contrast).
+3. Optionally load brand fonts with the `expo-font` config plugin.
+4. Point `apiBaseUrl` (`app.config.ts`) at your backend and adapt `src/lib/auth/auth-contract.ts`
+   (access + refresh token with Bearer auth; other auth models need their own design).
+
+Left to each project on purpose: environments and build flavors, EAS Build/Submit and OTA updates, build numbering and signing, crash reporting (hook into `logger.error`), analytics and push notifications.
 
 For local Release verification:
 
