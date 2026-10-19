@@ -30,7 +30,7 @@ npm run ios     # Runs development build on iOS simulator/device
 - `npm run lint`: Runs ESLint with architectural boundary validation.
 - `npm run typecheck`: Runs strict TypeScript type-checking.
 - `npm test`: Runs test suite with Jest and MSW.
-- `npm run clean`: Cleans generated native directories, Metro caches, and build artifacts.
+- `npm run clean`: Removes generated native projects, root caches/artifacts, and Android/Apple build outputs inside installed packages while preserving package sources and distributions.
 - `npm run init-project`: Customizes app name, bundle ID, slug, and optionally strips sample features (`--clean-samples`).
 
 ## App Identity & Configuration
