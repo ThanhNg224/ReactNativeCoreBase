@@ -37,6 +37,7 @@ const config: ExpoConfig = {
     'expo-localization',
     'expo-image',
     './plugins/with-android-build-performance',
+    './plugins/with-android-toolchain',
   ],
   experiments: {
     typedRoutes: true,
