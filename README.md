@@ -1,4 +1,4 @@
-# ReactNativeCoreBase
+# React Native App Starter
 
 A reusable iOS and Android app core architecture built on **Expo SDK 57**, **React Native 0.86**, **React 19.2**, **TypeScript 6**, and **Expo Router**.
 

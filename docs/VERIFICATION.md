@@ -71,7 +71,7 @@ Generated native projects and export outputs were removed after verification.
 - iOS launch and UI interaction (sheets, keyboard/footer, dialogs and toasts) remain unverified.
   The installed Xcode toolchain has SDKs but no `Simulator.app` or available simulator runtime.
   The build above proves compilation and bundling; it does not prove runtime behavior.
-- For results on the pushed commit, see [GitHub Actions](https://github.com/ThanhNg224/ReactNativeCoreBase/actions).
+- For results on the pushed commit, see [GitHub Actions](https://github.com/ThanhNg224/react-native-app-starter/actions).
   CI's iOS job builds unsigned and only proves compilation.
 - No production backend, App Store / Play signing, or physical iOS device.
 
